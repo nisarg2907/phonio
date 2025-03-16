@@ -1,0 +1,34 @@
+
+.sidebar {
+    display: flex;
+    gap: 40px;
+    padding: 20px 40px;
+    position: absolute;
+    left: 0;
+    top: 40;
+  }
+  
+  .sidebar-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  
+  .sidebar-item {
+    color: #9D9A9A;
+    opacity: 0.7;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    font-size: 27px;
+    padding: 4px 0;
+  }
+  
+  .sidebar-item:hover {
+    opacity: 1;
+  }
+  
+  @media (max-width: 768px) {
+    .sidebar {
+      display: none;
+    }
+  }
