@@ -40,7 +40,6 @@
   margin-bottom: 25px;
 }
 
-/* Modified avatar container for better alignment and multiple rows on mobile */
 .avatars-container {
   display: flex;
   justify-content: center;
@@ -105,7 +104,6 @@
   font-weight: 500;
 }
 
-/* Improved carousel for better centering and smooth transitions */
 .testimonials-carousel {
   display: flex;
   overflow-x: hidden;
@@ -244,7 +242,6 @@
   margin: 0;
 }
 
-/* Mobile-specific styles for avatar grid layout */
 @media (max-width: 768px) {
   .hero-heading h1 {
     font-size: 36px;
@@ -265,7 +262,6 @@
     padding: 20px;
   }
 
-  /* Grid layout for avatars on mobile */
   .avatars-container {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -307,7 +303,6 @@
   }
 }
 
-/* Larger screens */
 @media (min-width: 1200px) {
   .testimonial-card {
     min-width: 450px;

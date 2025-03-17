@@ -21,51 +21,46 @@ export default function Testimonials() {
     return ((realIndex % testimonialsLength) + testimonialsLength) % testimonialsLength;
   };
   
-  // Create an infinite array of testimonials for display
   const createInfiniteTestimonials = () => {
-    // Add items before and after to create the infinite effect
     return [
-      // Last item (for wrapping to the left)
       {...testimonials[testimonialsLength - 1], virtualIndex: -1},
-      // Current items
       ...testimonials.map((item, index) => ({...item, virtualIndex: index})),
-      // First item (for wrapping to the right)
       {...testimonials[0], virtualIndex: testimonialsLength}
     ];
   };
   
   const infiniteTestimonials = createInfiniteTestimonials();
   
-  // Scroll to the card and ensure it's centered
   const scrollToCard = (index, smooth = true) => {
     if (!carouselRef.current) return;
 
     const normalizedIndex = getVirtualIndex(index);
-    
-    // Add 1 to account for the prepended item
     const targetIndex = normalizedIndex + 1;
-    
     const cardWidth = carouselRef.current.querySelector('.testimonial-card').offsetWidth;
     const containerWidth = carouselRef.current.offsetWidth;
-    
-    // Calculate position to center the card
     const centerPosition = (targetIndex * cardWidth) - (containerWidth / 2) + (cardWidth / 2);
+    carouselRef.current.offsetHeight;
     
-    carouselRef.current.scrollTo({
-      left: centerPosition,
-      behavior: smooth ? 'smooth' : 'auto'
+    requestAnimationFrame(() => {
+      carouselRef.current.scrollTo({
+        left: centerPosition,
+        behavior: smooth ? 'smooth' : 'auto'
+      });
+      
+      setTimeout(() => {
+        if (Math.abs(carouselRef.current.scrollLeft - centerPosition) > 10) {
+          carouselRef.current.scrollLeft = centerPosition;
+        }
+      }, smooth ? 300 : 0);
     });
     
-    // Center the avatar
     updateAvatarScroll(normalizedIndex);
   };
 
-  // Update which cards are active/adjacent
   const updateCardClasses = () => {
     if (!carouselRef.current) return;
     
     const cards = Array.from(carouselRef.current.querySelectorAll('.testimonial-card'));
-    
     const normalizedActiveIndex = getVirtualIndex(activeIndex);
     const prevIndex = getVirtualIndex(activeIndex - 1);
     const nextIndex = getVirtualIndex(activeIndex + 1);
@@ -74,7 +69,6 @@ export default function Testimonials() {
       const virtualIndex = parseInt(card.dataset.virtualIndex);
       card.classList.remove('active', 'adjacent-left', 'adjacent-right');
       
-      // Handle special case for the wrapped items
       if (virtualIndex === -1 && normalizedActiveIndex === testimonialsLength - 1) {
         card.classList.add('active');
       } else if (virtualIndex === testimonialsLength && normalizedActiveIndex === 0) {
@@ -89,7 +83,6 @@ export default function Testimonials() {
     });
   };
 
-  // Auto rotation with interval
   useEffect(() => {
     const interval = setInterval(() => {
       if (!isDragging) {
@@ -101,13 +94,11 @@ export default function Testimonials() {
     return () => clearInterval(interval);
   }, [isDragging, activeIndex]);
 
-  // Update scroll position and classes when active index changes
   useEffect(() => {
     updateCardClasses();
     scrollToCard(activeIndex, !isDragging);
   }, [activeIndex, isDragging]);
 
-  // Handle avatar click
   const handleAvatarClick = (index) => {
     if (animationFrameId) {
       cancelAnimationFrame(animationFrameId);
@@ -115,13 +106,19 @@ export default function Testimonials() {
     }
     
     setActiveIndex(index);
+    
+    setTimeout(() => {
+      scrollToCard(index, false);
+      
+      setTimeout(() => {
+        scrollToCard(index, true);
+      }, 50);
+    }, 0);
   };
 
-  // Handle card click
   const handleCardClick = (index) => {
     const virtualIndex = parseInt(index);
     
-    // Handle the special cases for the first and last (repeated) items
     if (virtualIndex === -1) {
       setActiveIndex(testimonialsLength - 1);
     } else if (virtualIndex === testimonialsLength) {
@@ -131,7 +128,6 @@ export default function Testimonials() {
     }
   };
 
-  // Mouse events for dragging
   const handleMouseDown = (e) => {
     if (animationFrameId) {
       cancelAnimationFrame(animationFrameId);
@@ -164,7 +160,6 @@ export default function Testimonials() {
     setLastTimestamp(currentTime);
   };
 
-  // Handle end of drag with momentum and snap-to
   const handleMouseUp = () => {
     if (!isDragging) return;
     setIsDragging(false);
@@ -187,10 +182,8 @@ export default function Testimonials() {
         const containerCenter = carouselRef.current.offsetWidth / 2;
         const scrollPosition = carouselRef.current.scrollLeft + containerCenter;
         
-        // Find the closest card based on scroll position
-        let closestIndex = Math.round(scrollPosition / cardWidth) - 1; // -1 to account for prepended item
+        let closestIndex = Math.round(scrollPosition / cardWidth) - 1;
         
-        // Handle the special cases
         if (closestIndex < 0) {
           closestIndex = testimonialsLength - 1;
         } else if (closestIndex >= testimonialsLength) {
@@ -208,7 +201,6 @@ export default function Testimonials() {
     animateMomentum();
   };
 
-  // Touch events (mobile)
   const handleTouchStart = (e) => {
     if (animationFrameId) {
       cancelAnimationFrame(animationFrameId);
@@ -242,7 +234,6 @@ export default function Testimonials() {
 
   const handleTouchEnd = handleMouseUp;
 
-  // Scroll the avatar to center the selected one
   const updateAvatarScroll = (index) => {
     if (avatarsRef.current && index !== null) {
       const avatarElements = avatarsRef.current.children;
@@ -252,20 +243,22 @@ export default function Testimonials() {
         const avatarLeft = avatarElement.offsetLeft;
         const avatarWidth = avatarElement.offsetWidth;
         
-        avatarsRef.current.scrollTo({
-          left: avatarLeft - (containerWidth / 2) + (avatarWidth / 2),
-          behavior: 'smooth'
+        avatarsRef.current.offsetHeight;
+        
+        requestAnimationFrame(() => {
+          avatarsRef.current.scrollTo({
+            left: avatarLeft - (containerWidth / 2) + (avatarWidth / 2),
+            behavior: 'smooth'
+          });
         });
       }
     }
   };
 
-  // Ensure avatar scrolls when active index changes
   useEffect(() => {
     updateAvatarScroll(getVirtualIndex(activeIndex));
   }, [activeIndex]);
 
-  // Handle window resize to recalculate positions
   useEffect(() => {
     const handleResize = () => {
       scrollToCard(activeIndex, false);
@@ -275,13 +268,19 @@ export default function Testimonials() {
     return () => window.removeEventListener('resize', handleResize);
   }, [activeIndex]);
 
-  // Initial setup after component mounts
   useEffect(() => {
-    // Initial scroll to center the initial active card
     if (carouselRef.current) {
-      setTimeout(() => {
-        scrollToCard(activeIndex, false);
-      }, 100);
+      scrollToCard(activeIndex, false);
+      
+      const delays = [50, 100, 300, 500];
+      
+      delays.forEach(delay => {
+        setTimeout(() => {
+          if (carouselRef.current) {
+            scrollToCard(activeIndex, delay > 100);
+          }
+        }, delay);
+      });
     }
   }, []);
 
