@@ -17,74 +17,97 @@ export default function Testimonials() {
   const avatarsRef = useRef(null);
   const testimonialsLength = testimonials.length;
   
-  // Create a wrapped array of testimonials to create the illusion of infinite scrolling
-  // This adds the last testimonial at the beginning and the first testimonial at the end
   const getVirtualIndex = (realIndex) => {
     return ((realIndex % testimonialsLength) + testimonialsLength) % testimonialsLength;
   };
   
-  // Calculate the position to scroll to for a given index
+  // Create an infinite array of testimonials for display
+  const createInfiniteTestimonials = () => {
+    // Add items before and after to create the infinite effect
+    return [
+      // Last item (for wrapping to the left)
+      {...testimonials[testimonialsLength - 1], virtualIndex: -1},
+      // Current items
+      ...testimonials.map((item, index) => ({...item, virtualIndex: index})),
+      // First item (for wrapping to the right)
+      {...testimonials[0], virtualIndex: testimonialsLength}
+    ];
+  };
+  
+  const infiniteTestimonials = createInfiniteTestimonials();
+  
+  // Scroll to the card and ensure it's centered
   const scrollToCard = (index, smooth = true) => {
     if (!carouselRef.current) return;
 
-    // Normalize the index to ensure it's within bounds
     const normalizedIndex = getVirtualIndex(index);
     
-    const cardWidth = 450;
-    const gapWidth = 2;
-    const activeCardExtraMargin = 5;
-    const totalWidth = cardWidth + gapWidth + activeCardExtraMargin;
+    // Add 1 to account for the prepended item
+    const targetIndex = normalizedIndex + 1;
     
+    const cardWidth = carouselRef.current.querySelector('.testimonial-card').offsetWidth;
     const containerWidth = carouselRef.current.offsetWidth;
-    const centerPosition = (normalizedIndex * totalWidth) - (containerWidth / 2) + (cardWidth / 2);
+    
+    // Calculate position to center the card
+    const centerPosition = (targetIndex * cardWidth) - (containerWidth / 2) + (cardWidth / 2);
     
     carouselRef.current.scrollTo({
       left: centerPosition,
       behavior: smooth ? 'smooth' : 'auto'
     });
     
-    // Update the active avatar
+    // Center the avatar
     updateAvatarScroll(normalizedIndex);
   };
 
-  // Update which cards have the adjacent-left and adjacent-right classes
-  const updateAdjacentCards = () => {
+  // Update which cards are active/adjacent
+  const updateCardClasses = () => {
     if (!carouselRef.current) return;
     
-    const cards = Array.from(carouselRef.current.children);
-    cards.forEach((card, index) => {
-      card.classList.remove('adjacent-left', 'adjacent-right');
+    const cards = Array.from(carouselRef.current.querySelectorAll('.testimonial-card'));
+    
+    const normalizedActiveIndex = getVirtualIndex(activeIndex);
+    const prevIndex = getVirtualIndex(activeIndex - 1);
+    const nextIndex = getVirtualIndex(activeIndex + 1);
+    
+    cards.forEach(card => {
+      const virtualIndex = parseInt(card.dataset.virtualIndex);
+      card.classList.remove('active', 'adjacent-left', 'adjacent-right');
       
-      const prevIndex = getVirtualIndex(activeIndex - 1);
-      const nextIndex = getVirtualIndex(activeIndex + 1);
-      
-      if (getVirtualIndex(index) === prevIndex) {
+      // Handle special case for the wrapped items
+      if (virtualIndex === -1 && normalizedActiveIndex === testimonialsLength - 1) {
+        card.classList.add('active');
+      } else if (virtualIndex === testimonialsLength && normalizedActiveIndex === 0) {
+        card.classList.add('active');
+      } else if (virtualIndex === normalizedActiveIndex) {
+        card.classList.add('active');
+      } else if (virtualIndex === prevIndex || (virtualIndex === testimonialsLength - 1 && normalizedActiveIndex === 0)) {
         card.classList.add('adjacent-left');
-      } else if (getVirtualIndex(index) === nextIndex) {
+      } else if (virtualIndex === nextIndex || (virtualIndex === 0 && normalizedActiveIndex === testimonialsLength - 1)) {
         card.classList.add('adjacent-right');
       }
     });
   };
 
-  // Circular auto-scrolling with slower transition (8000ms)
+  // Auto rotation with interval
   useEffect(() => {
     const interval = setInterval(() => {
       if (!isDragging) {
         const nextIndex = getVirtualIndex(activeIndex + 1);
         setActiveIndex(nextIndex);
-        scrollToCard(nextIndex);
       }
-    }, 8000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [isDragging, activeIndex]);
 
+  // Update scroll position and classes when active index changes
   useEffect(() => {
-    updateAdjacentCards();
+    updateCardClasses();
     scrollToCard(activeIndex, !isDragging);
   }, [activeIndex, isDragging]);
 
-  // When clicking on an avatar, immediately focus that testimonial
+  // Handle avatar click
   const handleAvatarClick = (index) => {
     if (animationFrameId) {
       cancelAnimationFrame(animationFrameId);
@@ -92,15 +115,23 @@ export default function Testimonials() {
     }
     
     setActiveIndex(index);
-    scrollToCard(index);
   };
 
+  // Handle card click
   const handleCardClick = (index) => {
-    if (getVirtualIndex(index) !== activeIndex) {
-      handleAvatarClick(getVirtualIndex(index));
+    const virtualIndex = parseInt(index);
+    
+    // Handle the special cases for the first and last (repeated) items
+    if (virtualIndex === -1) {
+      setActiveIndex(testimonialsLength - 1);
+    } else if (virtualIndex === testimonialsLength) {
+      setActiveIndex(0);
+    } else if (virtualIndex !== getVirtualIndex(activeIndex)) {
+      setActiveIndex(virtualIndex);
     }
   };
 
+  // Mouse events for dragging
   const handleMouseDown = (e) => {
     if (animationFrameId) {
       cancelAnimationFrame(animationFrameId);
@@ -133,6 +164,7 @@ export default function Testimonials() {
     setLastTimestamp(currentTime);
   };
 
+  // Handle end of drag with momentum and snap-to
   const handleMouseUp = () => {
     if (!isDragging) return;
     setIsDragging(false);
@@ -151,21 +183,21 @@ export default function Testimonials() {
       currentVelocity *= Math.pow(0.96, deltaTime / 16.7);
       
       if (Math.abs(currentVelocity) < 0.5) {
-        const cardWidth = 450;
-        const gapWidth = 2;
-        const activeCardExtraMargin = 5;
-        const totalCardWidth = cardWidth + gapWidth + activeCardExtraMargin;
-        
+        const cardWidth = carouselRef.current.querySelector('.testimonial-card').offsetWidth;
         const containerCenter = carouselRef.current.offsetWidth / 2;
         const scrollPosition = carouselRef.current.scrollLeft + containerCenter;
         
-        let closestIndex = Math.round(scrollPosition / totalCardWidth);
+        // Find the closest card based on scroll position
+        let closestIndex = Math.round(scrollPosition / cardWidth) - 1; // -1 to account for prepended item
         
-        // Ensure circular behavior by wrapping the index
-        closestIndex = getVirtualIndex(closestIndex);
+        // Handle the special cases
+        if (closestIndex < 0) {
+          closestIndex = testimonialsLength - 1;
+        } else if (closestIndex >= testimonialsLength) {
+          closestIndex = 0;
+        }
         
         setActiveIndex(closestIndex);
-        scrollToCard(closestIndex);
         return;
       }
       
@@ -176,6 +208,7 @@ export default function Testimonials() {
     animateMomentum();
   };
 
+  // Touch events (mobile)
   const handleTouchStart = (e) => {
     if (animationFrameId) {
       cancelAnimationFrame(animationFrameId);
@@ -209,7 +242,7 @@ export default function Testimonials() {
 
   const handleTouchEnd = handleMouseUp;
 
-  // Function to scroll avatar container to show active avatar
+  // Scroll the avatar to center the selected one
   const updateAvatarScroll = (index) => {
     if (avatarsRef.current && index !== null) {
       const avatarElements = avatarsRef.current.children;
@@ -219,32 +252,38 @@ export default function Testimonials() {
         const avatarLeft = avatarElement.offsetLeft;
         const avatarWidth = avatarElement.offsetWidth;
         
-        avatarsRef.current.scrollLeft = avatarLeft - (containerWidth / 2) + (avatarWidth / 2);
+        avatarsRef.current.scrollTo({
+          left: avatarLeft - (containerWidth / 2) + (avatarWidth / 2),
+          behavior: 'smooth'
+        });
       }
     }
   };
 
-  // Scroll avatar container to show active avatar
+  // Ensure avatar scrolls when active index changes
   useEffect(() => {
-    updateAvatarScroll(activeIndex);
+    updateAvatarScroll(getVirtualIndex(activeIndex));
   }, [activeIndex]);
 
-  // Function to create duplicate testimonials at the beginning and end
-  // This creates the illusion of infinite scrolling
-  const createInfiniteTestimonialsList = () => {
-    const lastIndex = testimonialsLength - 1;
+  // Handle window resize to recalculate positions
+  useEffect(() => {
+    const handleResize = () => {
+      scrollToCard(activeIndex, false);
+    };
     
-    // Create a new array with duplicated items at beginning and end
-    return [
-      ...testimonials.map((testimonial, index) => ({
-        ...testimonial,
-        virtualIndex: index,
-      })),
-    ];
-  };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [activeIndex]);
 
-  // Get the infinite list of testimonials
-  const infiniteTestimonials = createInfiniteTestimonialsList();
+  // Initial setup after component mounts
+  useEffect(() => {
+    // Initial scroll to center the initial active card
+    if (carouselRef.current) {
+      setTimeout(() => {
+        scrollToCard(activeIndex, false);
+      }, 100);
+    }
+  }, []);
 
   return (
     <div className="testimonials-section">
@@ -283,49 +322,16 @@ export default function Testimonials() {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Add the last testimonial at the beginning for infinite scrolling */}
-        <div
-          key="last-clone"
-          className={`testimonial-card ${activeIndex === testimonialsLength - 1 ? 'active' : ''} ${activeIndex === 0 ? 'adjacent-left' : ''}`}
-          onClick={() => handleCardClick(testimonialsLength - 1)}
-          data-index={testimonialsLength - 1}
-        >
-          {activeIndex === testimonialsLength - 1 && (
-            <>
-              <div className="top-left-corner"></div>
-              <div className="top-right-corner"></div>
-              <div className="bottom-left-corner"></div>
-              <div className="bottom-right-corner"></div>
-            </>
-          )}
-          <div className="testimonial-content">
-            <p>{testimonials[testimonialsLength - 1].testimonial}</p>
-          </div>
-          <div className="testimonial-author">
-            <div className="author-avatar">
-              {testimonials[testimonialsLength - 1].image}
-            </div>
-            <div className="author-info">
-              <h4>{testimonials[testimonialsLength - 1].name}</h4>
-              <p>{testimonials[testimonialsLength - 1].designation}</p>
-            </div>
-          </div>
-        </div>
-        
-        {/* Original testimonials */}
-        {testimonials.map((testimonial, index) => {
-          const isPrev = (index === getVirtualIndex(activeIndex - 1));
-          const isNext = (index === getVirtualIndex(activeIndex + 1));
-          const adjacentClass = isPrev ? 'adjacent-left' : (isNext ? 'adjacent-right' : '');
-          
+        {infiniteTestimonials.map((testimonial, index) => {
+          const virtualIndex = testimonial.virtualIndex;
           return (
             <div
               key={index}
-              className={`testimonial-card ${activeIndex === index ? 'active' : ''} ${adjacentClass}`}
-              onClick={() => handleCardClick(index)}
-              data-index={index}
+              className="testimonial-card"
+              onClick={() => handleCardClick(virtualIndex)}
+              data-virtual-index={virtualIndex}
             >
-              {activeIndex === index && (
+              {activeIndex === virtualIndex && (
                 <>
                   <div className="top-left-corner"></div>
                   <div className="top-right-corner"></div>
@@ -348,35 +354,6 @@ export default function Testimonials() {
             </div>
           );
         })}
-        
-        {/* Add the first testimonial at the end for infinite scrolling */}
-        <div
-          key="first-clone"
-          className={`testimonial-card ${activeIndex === 0 ? 'active' : ''} ${activeIndex === testimonialsLength - 1 ? 'adjacent-right' : ''}`}
-          onClick={() => handleCardClick(0)}
-          data-index={0}
-        >
-          {activeIndex === 0 && (
-            <>
-              <div className="top-left-corner"></div>
-              <div className="top-right-corner"></div>
-              <div className="bottom-left-corner"></div>
-              <div className="bottom-right-corner"></div>
-            </>
-          )}
-          <div className="testimonial-content">
-            <p>{testimonials[0].testimonial}</p>
-          </div>
-          <div className="testimonial-author">
-            <div className="author-avatar">
-              {testimonials[0].image}
-            </div>
-            <div className="author-info">
-              <h4>{testimonials[0].name}</h4>
-              <p>{testimonials[0].designation}</p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

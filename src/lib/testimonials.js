@@ -10,7 +10,7 @@ export const testimonials = [
     {
       name: "Jason Harvey",
       image: <Image src="https://cdn.prod.website-files.com/673ca620b98035f221528ad1/6783a10a476c5bccbe81904a_avatar-jason.avif" loading="lazy" alt="Jason Harvey" className="image round" width={50} height={50} />,
-      testimonial: "The efficiency and ease of use that Osmo provides are unparalleled. It has significantly improved our workflow. The features are intuitive and the support team is always ready to assist, making our tasks much easier.",
+      testimonial: "The efficiency and ease of use that Osmo provides are unparalleled. It has significantly improved our workflow. The features are intuitive and the support team is always ready to assist, making our tasks much easier. We have seen a noticeable increase in our productivity and the overall satisfaction of our team members. Osmo's continuous updates and new features keep us ahead of the curve, ensuring that we always have the best tools at our disposal.",
       designation: "Backend Developer at InnovateX"
     },
     {
@@ -22,7 +22,7 @@ export const testimonials = [
     {
       name: "Huy (By Huy)",
       image: <Image src="https://cdn.prod.website-files.com/673ca620b98035f221528ad1/6783a09b5ee17587313b233f_avatar-huy.avif" loading="lazy" alt="Huy (by Huy)" className="image round" width={50} height={50} />,
-      testimonial: "I can't imagine going back to our old tools after using Osmo. It's simply the best SaaS product we've ever used. The continuous updates and new features keep us ahead of the competition.",
+      testimonial: "I can't imagine going back to our old tools after using Osmo. It's simply the best SaaS product we've ever used. The continuous updates and new features keep us ahead of the competition. The user-friendly design and robust features have made our team more productive than ever. The seamless integration with our existing tools has been a huge plus, enhancing our overall efficiency and making our workflow smoother.",
       designation: "Product Manager at NextGen"
     },
     {
@@ -34,7 +34,7 @@ export const testimonials = [
     {
       name: "Jesper Landberg",
       image: <Image src="https://cdn.prod.website-files.com/673ca620b98035f221528ad1/6785136cdeca199d875404fc_avatar-jesper.avif" loading="lazy" alt="Jesper Landberg" className="image round" width={50} height={50} />,
-      testimonial: "The seamless integration and powerful tools that Osmo offers have transformed our business operations. It has enabled us to streamline our processes and improve our project management significantly.",
+      testimonial: "The seamless integration and powerful tools that Osmo offers have transformed our business operations. It has enabled us to streamline our processes and improve our project management significantly. The intuitive interface and powerful features make it a must-have for any team. It has streamlined our workflow and increased our productivity significantly. We have seen a noticeable increase in our productivity and the overall satisfaction of our team members.",
       designation: "CTO at FutureTech"
     },
     {
@@ -58,7 +58,7 @@ export const testimonials = [
     {
       name: "Dylan Brouwer",
       image: <Image src="https://cdn.prod.website-files.com/673ca620b98035f221528ad1/67839d2f3846acf48375bb7b_avatar-dylan.avif" loading="lazy" alt="Dylan Brouwer" className="image round" width={50} height={50} />,
-      testimonial: "Osmo has significantly improved our team's efficiency and collaboration. We highly recommend it. The user-friendly design and robust features have made a noticeable difference in our productivity.",
+      testimonial: "Osmo has significantly improved our team's efficiency and collaboration. We highly recommend it. The user-friendly design and robust features have made a noticeable difference in our productivity. The seamless integration with our existing tools has been a huge plus, enhancing our overall efficiency and making our workflow smoother. The continuous updates and new features keep us ahead of the competition.",
       designation: "Project Manager at AgileWorks"
     }
   ];
