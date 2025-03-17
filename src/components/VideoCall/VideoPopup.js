@@ -11,17 +11,14 @@ export default function VideoPopup({ onClose }) {
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   
-  // For demo purposes - in a real implementation this would be LiveKit participants
   const [localStream, setLocalStream] = useState(null);
   
   useEffect(() => {
-    // Log build time on client side
     const buildTime = document.querySelector('meta[name="build-time"]')?.content;
     if (buildTime) {
       console.log(`Page last built at: ${buildTime}`);
     }
 
-    // Simulate getting local camera stream
     if (typeof navigator !== 'undefined' && navigator.mediaDevices) {
       const getMedia = async () => {
         try {
@@ -38,7 +35,6 @@ export default function VideoPopup({ onClose }) {
       getMedia();
       
       return () => {
-        // Clean up media streams when component unmounts
         if (localStream) {
           localStream.getTracks().forEach(track => track.stop());
         }
@@ -93,7 +89,6 @@ export default function VideoPopup({ onClose }) {
   };
 
   useEffect(() => {
-    // Add global mouse event listeners for dragging
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
     
@@ -134,7 +129,6 @@ export default function VideoPopup({ onClose }) {
             }}
           />
         )}
-        {/* This would be where remote participants' videos would be shown */}
         <div className="remote-videos-placeholder">
           {!localStream && <div className="video-placeholder">Camera access required</div>}
         </div>
