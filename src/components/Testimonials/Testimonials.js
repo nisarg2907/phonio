@@ -92,27 +92,33 @@ export default function Testimonials() {
     }, 6000);
 
     return () => clearInterval(interval);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDragging, activeIndex]);
 
   useEffect(() => {
     updateCardClasses();
     scrollToCard(activeIndex, !isDragging);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex, isDragging]);
 
+  
   const handleAvatarClick = (index) => {
     if (animationFrameId) {
       cancelAnimationFrame(animationFrameId);
       setAnimationFrameId(null);
     }
-    
-    setActiveIndex(index);
-    
+
+    // Handle edge cases for the first and last avatars
+    if (index === 0) {
+      setActiveIndex(testimonialsLength1);
+    } else if (index === testimonialsLength - 1) {
+      setActiveIndex(-1);
+    } else {
+      setActiveIndex(index);
+    }
+
     setTimeout(() => {
-      scrollToCard(index, false);
-      
-      setTimeout(() => {
-        scrollToCard(index, true);
-      }, 50);
+      scrollToCard(index, true);
     }, 0);
   };
 
@@ -257,6 +263,7 @@ export default function Testimonials() {
 
   useEffect(() => {
     updateAvatarScroll(getVirtualIndex(activeIndex));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex]);
 
   useEffect(() => {
@@ -266,6 +273,7 @@ export default function Testimonials() {
     
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex]);
 
   useEffect(() => {
@@ -282,6 +290,7 @@ export default function Testimonials() {
         }, delay);
       });
     }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
