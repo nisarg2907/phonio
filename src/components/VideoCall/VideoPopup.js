@@ -11,6 +11,7 @@ import {
 } from '@livekit/components-react';
 import '@livekit/components-styles';
 import { Track } from 'livekit-client';
+import '@/styles/videopopup.css';
 
 export default function VideoCallPopup({ roomId, username, onClose }) {
   const [token, setToken] = useState('');
@@ -111,6 +112,7 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDragging, dragOffset]);
 
   if (!token) {
@@ -121,76 +123,44 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
     <div 
       ref={popupRef}
       className="video-call-popup"
-      style={{
-        position: 'fixed',
-        top: `${position.y}px`,
-        left: `${position.x}px`,
-        width: `${size.width}px`,
-        height: `${size.height}px`,
-        zIndex: 9999,
-        background: 'white',
-        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.3)',
-        borderRadius: '8px',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        cursor: isDragging ? 'grabbing' : 'grab'
-      }}
     >
       <div 
         className="popup-header"
         onMouseDown={handleMouseDown}
-        style={{
-          background: '#2c3e50',
-          color: 'white',
-          padding: '10px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}
       >
         <div>Video Call: Room {roomId}</div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button 
             onClick={togglePiP}
-            style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}
+            className="header-button"
           >
             {isPiP ? 'Expand' : 'PiP'}
           </button>
           <button 
             onClick={onClose}
-            style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}
+            className="header-button"
           >
             ✕
           </button>
         </div>
       </div>
       
-      <div style={{ flex: 1, position: 'relative' }}>
+      <div className="video-container">
         <LiveKitRoom
           video={true}
           audio={true}
           token={token}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
           data-lk-theme="default"
-          style={{ height: '100%' }}
         >
           <VideoConferenceComponent />
           <RoomAudioRenderer />
-          <ControlBar style={{ position: 'absolute', bottom: 0, width: '100%' }} />
+          <ControlBar className="lk-control-bar" />
         </LiveKitRoom>
       </div>
       
       <div 
         className="resize-handle"
-        style={{
-          position: 'absolute',
-          right: 0,
-          bottom: 0,
-          width: '20px',
-          height: '20px',
-          cursor: 'se-resize'
-        }}
         onMouseDown={(e) => handleResize(e, 'se')}
       ></div>
     </div>

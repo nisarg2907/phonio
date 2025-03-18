@@ -9,12 +9,12 @@ export default function Home() {
   
   return (
     <main className="main-container">
-      <Header />
+      <Header/>
       <div className="content-wrapper">
         <Hero />
         <Testimonials/>
-        <JoinCallButton />
       </div>
+      <JoinCallButton/>
     </main>
   );
 }

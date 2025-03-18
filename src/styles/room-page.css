@@ -1,0 +1,192 @@
+.join-container {
+  max-width: 500px;
+  width: 90%;
+  margin: 5vh auto;
+  padding: 25px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  background-color: white;
+}
+
+.join-container h2 {
+  color: black;
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  font-size: 15px;
+}
+
+.form-input {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 15px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #ff5722;
+  box-shadow: 0 0 0 2px rgba(255, 87, 34, 0.2);
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.form-row .form-input {
+  flex: 1;
+  margin-top: 0;
+}
+
+.share-button {
+  padding: 8px 15px;
+  background-color: #ff5722;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  height: fit-content;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.share-button:hover {
+  background-color: #e64a19;
+  transform: translateY(-2px);
+}
+
+.join-button {
+  padding: 12px 20px;
+  background-color: #ff5722;
+  color: white;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.3s, transform 0.2s;
+  margin-top: 10px;
+}
+
+.join-button:hover {
+  background-color: #e64a19;
+  transform: translateY(-2px);
+}
+
+/* LiveKit styles */
+.livekit-container {
+  height: 100dvh;
+  width: 100%;
+}
+
+.video-grid {
+  height: calc(100vh - var(--lk-control-bar-height));
+  width: 100%;
+}
+
+/* Room styling when in a call */
+.in-call-container {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .join-container {
+    width: 95%;
+    padding: 20px;
+    margin: 4vh auto;
+  }
+  
+  .join-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    font-size: 14px;
+  }
+  
+  .form-input {
+    padding: 10px;
+    font-size: 14px;
+  }
+  
+  .share-button {
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+  
+  .join-button {
+    padding: 10px 16px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .join-container {
+    padding: 15px;
+    margin: 2vh auto;
+    width: 92%;
+  }
+  
+  .join-container h2 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    font-size: 13px;
+    margin-bottom: 5px;
+  }
+  
+  .form-input {
+    padding: 8px;
+    font-size: 13px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .form-row .form-input {
+    width: 100%;
+  }
+  
+  .share-button {
+    width: 100%;
+    margin-top: 5px;
+  }
+  
+  .join-button {
+    padding: 10px;
+    font-size: 14px;
+  }
+}

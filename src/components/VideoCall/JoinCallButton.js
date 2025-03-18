@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import VideoCallPopup from './VideoPopup';
+import '@/styles/join-call-button.css'
 
 export default function JoinCallButton() {
   const [showPopup, setShowPopup] = useState(false);
@@ -27,78 +28,44 @@ export default function JoinCallButton() {
     <>
       <button 
         onClick={() => setShowForm(true)}
-        style={{
-          padding: '10px 20px',
-          backgroundColor: '#4CAF50',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer'
-        }}
+        className="join-call-button"
       >
         Join Call
       </button>
 
       {showForm && (
-        <div style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'white',
-          padding: '20px',
-          borderRadius: '8px',
-          boxShadow: '0 5px 15px rgba(0, 0, 0, 0.3)',
-          zIndex: 9998,
-          maxWidth: '400px',
-          width: '100%'
-        }}>
+        <div className="form-modal">
           <h3>Join Video Call</h3>
           <form onSubmit={handleJoinCall}>
-            <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px' }}>Your Name:</label>
+            <div className="form-group">
+              <label>Your Name:</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                style={{ width: '100%', padding: '8px' }}
                 required
               />
             </div>
-            <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px' }}>Room ID:</label>
+            <div className="form-group">
+              <label>Room ID:</label>
               <input
                 type="text"
                 value={roomId}
                 onChange={(e) => setRoomId(e.target.value)}
-                style={{ width: '100%', padding: '8px' }}
                 required
               />
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div className="form-actions">
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                style={{
-                  padding: '8px 15px',
-                  backgroundColor: '#ccc',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
+                className="cancel-button"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                style={{
-                  padding: '8px 15px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
+                className="join-button"
               >
                 Join
               </button>
