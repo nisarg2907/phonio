@@ -38,10 +38,8 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
     fetchToken();
   }, [roomId, username]);
 
-  // Position the popup in the center initially
   useEffect(() => {
     if (popupRef.current) {
-      // Apply the position and size
       updatePopupStyles();
     }
   }, [position, size, isPiP]);
@@ -62,7 +60,6 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
   };
 
   const handleMouseDown = (e) => {
-    // Ignore if clicking on a button or resize handle
     if (e.target.closest('.header-button') || e.target.closest('.resize-handle')) return;
     
     setIsDragging(true);
@@ -71,19 +68,16 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
       y: e.clientY - position.y
     });
     
-    // Set cursor to grabbing
     if (popupRef.current) {
       popupRef.current.style.cursor = 'grabbing';
     }
     
-    // Prevent text selection during drag
     e.preventDefault();
   };
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
     
-    // Calculate new position with bounds checking
     const newX = Math.max(0, Math.min(e.clientX - dragOffset.x, window.innerWidth - size.width));
     const newY = Math.max(0, Math.min(e.clientY - dragOffset.y, window.innerHeight - size.height));
     
@@ -100,7 +94,6 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
     setIsDragging(false);
   };
 
-  // Handle resizing functionality
   const handleResize = (e, direction) => {
     e.preventDefault();
     e.stopPropagation();
@@ -115,7 +108,6 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
       const dy = mouseMoveEvent.clientY - startY;
       
       if (direction === 'se') {
-        // Set new size with minimum dimensions
         setSize({
           width: Math.max(300, startWidth + dx),
           height: Math.max(200, startHeight + dy)
@@ -132,36 +124,30 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
     document.addEventListener('mouseup', onMouseUp);
   };
 
-  // Toggle Picture-in-Picture mode
   const togglePiP = async () => {
     if (!isPiP) {
       try {
-        // Use the documentPictureInPicture API
         if ('documentPictureInPicture' in window) {
           const pipOptions = { width: 320, height: 240 };
           const newPipWindow = await window.documentPictureInPicture.requestWindow(pipOptions);
           setPipWindow(newPipWindow);
 
-          // Clone the video element from LiveKit
           const videoElement = videoContainerRef.current.querySelector('video');
           if (!videoElement) {
             console.error('No video element found');
             return;
           }
 
-          // Create new video element for PiP
           const pipVideo = document.createElement('video');
           pipVideo.autoplay = true;
           pipVideo.srcObject = videoElement.srcObject;
           pipVideo.style.width = '100%';
           pipVideo.style.height = '100%';
-          pipVideo.muted = true; // Mute PiP window audio
+          pipVideo.muted = true;
 
-          // Add video to PiP window
           newPipWindow.document.body.appendChild(pipVideo);
           pipVideo.play();
 
-          // Handle window close
           newPipWindow.addEventListener('pagehide', () => {
             setIsPiP(false);
             setPipWindow(null);
@@ -172,7 +158,6 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
         }
       } catch (err) {
         console.error('PiP error:', err);
-        // Fallback to CSS PiP
         setPosition({
           x: window.innerWidth - 320,
           y: window.innerHeight - 240
@@ -181,7 +166,6 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
         setIsPiP(true);
       }
     } else {
-      // Close PiP window
       if (pipWindow) pipWindow.close();
       setIsPiP(false);
       setSize({ width: 800, height: 600 });
@@ -192,10 +176,8 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
     }
   };
 
-  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
-      // Keep popup within window bounds
       const newX = Math.min(position.x, window.innerWidth - size.width);
       const newY = Math.min(position.y, window.innerHeight - size.height);
       
@@ -203,7 +185,6 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
         setPosition({ x: newX, y: newY });
       }
       
-      // If in PiP mode, stick to bottom right
       if (isPiP && !pipWindow) {
         setPosition({
           x: window.innerWidth - 320,
@@ -216,9 +197,7 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
     return () => window.removeEventListener('resize', handleResize);
   }, [position, size, isPiP, pipWindow]);
 
-  // Attach global mouse move and up events
   useEffect(() => {
-    // Only add listeners when dragging
     if (isDragging) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
@@ -230,7 +209,6 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
     }
   }, [isDragging]);
   
-  // Clean up PiP window on unmount
   useEffect(() => {
     return () => {
       if (pipWindow) {
@@ -304,6 +282,7 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
           token={token}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
           data-lk-theme="default"
+          onDisconnected={onClose}
         >
           <VideoConferenceComponent />
           <RoomAudioRenderer />
