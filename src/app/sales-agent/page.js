@@ -45,6 +45,11 @@ function SalesAgentRoom() {
     }
   };
 
+  const leaveRoom = () => {
+    setIsJoined(false);
+    setToken('');
+  };
+
   const shareRoomLink = () => {
     const roomLink = `${process.env.NEXT_PUBLIC_DOMAIN_URL}/sales-agent?room=${room}`;
     navigator.clipboard.writeText(roomLink);
@@ -96,6 +101,7 @@ function SalesAgentRoom() {
       serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
       data-lk-theme="default"
       className="livekit-container"
+      onDisconnected={leaveRoom}
     >
       <MyVideoConference />
       <RoomAudioRenderer />
