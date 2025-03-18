@@ -11,7 +11,7 @@ import {
 } from '@livekit/components-react';
 import '@livekit/components-styles';
 import { Track } from 'livekit-client';
-import '@/styles/videopopup.css';
+import '@/styles/video-popup.css';
 
 export default function VideoCallPopup({ roomId, username, onClose }) {
   const [token, setToken] = useState('');
@@ -36,7 +36,6 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
     fetchToken();
   }, [roomId, username]);
 
-  // Handle dragging functionality
   const handleMouseDown = (e) => {
     if (e.target.closest('.resize-handle')) return;
     

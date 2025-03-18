@@ -1,4 +1,3 @@
-/* Base styles */
 .join-call-button {
     position: fixed;
     bottom: 20px;
@@ -106,7 +105,6 @@
     background-color: #e64a19;
   }
   
-  /* Responsive adjustments */
   @media (max-width: 768px) {
     .join-call-button {
       padding: 8px 16px;
