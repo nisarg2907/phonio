@@ -2,11 +2,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 40px;
+  padding: 10px 20px;
   background-color: transparent;
   position: sticky;
   top: 0;
-  margin: 40px 0px;
+  margin: 20px 0px;
   z-index: 1000;
 }
 
@@ -18,14 +18,14 @@
 }
 
 .logo {
-  font-size: 40px;
+  font-size: 30px;
   font-weight: 400;
   color: white;
   letter-spacing: -0.5px;
 }
 
 .logo-icon {
-  width: 32px;
+  width: 24px;
   height: 32px;
   color: white;
   transition: transform 2s ease;
@@ -48,7 +48,7 @@
 .nav-item {
   color: white;
   text-decoration: none;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 500;
   position: relative;
   opacity: 0.8;
@@ -134,7 +134,7 @@
   background: transparent;
   border: none;
   color: white;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 500;
   padding: 8px 16px;
   cursor: pointer;
@@ -200,7 +200,7 @@
   border: none;
   padding: 12px 24px;
   border-radius: 6px;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 300;
   cursor: pointer;
   position: relative;
