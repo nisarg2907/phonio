@@ -36,25 +36,38 @@ export default function Testimonials() {
 
     const normalizedIndex = getVirtualIndex(index);
     const targetIndex = normalizedIndex + 1;
-    const cardWidth = carouselRef.current.querySelector('.testimonial-card').offsetWidth;
+    const card = carouselRef.current.querySelector('.testimonial-card');
+    if (!card) return;
+
+    const cardWidth = card.offsetWidth;
     const containerWidth = carouselRef.current.offsetWidth;
     const centerPosition = (targetIndex * cardWidth) - (containerWidth / 2) + (cardWidth / 2);
-    carouselRef.current.offsetHeight;
+
+    let scrollCompleted = false;
     
-    requestAnimationFrame(() => {
-      carouselRef.current.scrollTo({
-        left: centerPosition,
-        behavior: smooth ? 'smooth' : 'auto'
-      });
-      
-      setTimeout(() => {
-        if (Math.abs(carouselRef.current.scrollLeft - centerPosition) > 10) {
-          carouselRef.current.scrollLeft = centerPosition;
-        }
-      }, smooth ? 300 : 0);
+    const finishScroll = () => {
+      if (scrollCompleted) return;
+      scrollCompleted = true;
+      updateAvatarScroll(normalizedIndex);
+    };
+
+    carouselRef.current.scrollTo({
+      left: centerPosition,
+      behavior: smooth ? 'smooth' : 'auto'
     });
-    
-    updateAvatarScroll(normalizedIndex);
+
+    if (!smooth) {
+      finishScroll();
+      return;
+    }
+
+    const onScrollEnd = () => {
+      finishScroll();
+      carouselRef.current.removeEventListener('scroll', onScrollEnd);
+    };
+
+    carouselRef.current.addEventListener('scroll', onScrollEnd);
+    setTimeout(onScrollEnd, 500);
   };
 
   const updateCardClasses = () => {
@@ -108,17 +121,8 @@ export default function Testimonials() {
       setAnimationFrameId(null);
     }
 
-    if (index === 0) {
-      setActiveIndex(0);
-    } else if (index === testimonialsLength - 1) {
-      setActiveIndex(-1);
-    } else {
-      setActiveIndex(index);
-    }
-
-    setTimeout(() => {
-      scrollToCard(index, true);
-    }, 0);
+    const targetIndex = index === testimonialsLength - 1 ? -1 : index;
+    setActiveIndex(targetIndex);
   };
 
   const handleCardClick = (index) => {
