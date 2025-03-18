@@ -108,9 +108,8 @@ export default function Testimonials() {
       setAnimationFrameId(null);
     }
 
-    // Handle edge cases for the first and last avatars
     if (index === 0) {
-      setActiveIndex(testimonialsLength1);
+      setActiveIndex(0);
     } else if (index === testimonialsLength - 1) {
       setActiveIndex(-1);
     } else {

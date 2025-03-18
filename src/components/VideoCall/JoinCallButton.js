@@ -7,7 +7,7 @@ import '@/styles/join-call-button.css'
 export default function JoinCallButton() {
   const [showPopup, setShowPopup] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState('user');
   const [roomId, setRoomId] = useState(`room-${Math.floor(Math.random() * 10000)}`);
 
   const handleJoinCall = (e) => {
@@ -38,7 +38,7 @@ export default function JoinCallButton() {
           <h3>Join Video Call</h3>
           <form onSubmit={handleJoinCall}>
             <div className="form-group">
-              <label>Your Name:</label>
+              <label>Your Name: *</label>
               <input
                 type="text"
                 value={username}
