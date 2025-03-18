@@ -9,12 +9,12 @@ import {
   useTracks,
 } from '@livekit/components-react';
 import '@livekit/components-styles';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { Track } from 'livekit-client';
 import { useSearchParams } from 'next/navigation';
 import '@/styles/room-page.css';
 
-export default function Page() {
+function SalesAgentRoom() {
   const searchParams = useSearchParams();
   const roomParam = searchParams.get('room');
   const [room, setRoom] = useState(roomParam || '');
@@ -116,5 +116,13 @@ function MyVideoConference() {
     <GridLayout tracks={tracks} className="video-grid">
       <ParticipantTile />
     </GridLayout>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SalesAgentRoom />
+    </Suspense>
   );
 }

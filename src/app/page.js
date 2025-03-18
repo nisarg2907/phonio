@@ -19,4 +19,4 @@ export default function Home() {
   );
 }
 
-export const revalidate = 60 * 60 * 5; 
+export const revalidate = 18000; 
