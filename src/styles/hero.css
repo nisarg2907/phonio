@@ -3,7 +3,8 @@
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  padding: 40px 0;
+  margin-top: auto;
+  padding: 50px 0;
   position: relative;
   overflow: visible;
   min-height: 90vh;
@@ -285,7 +286,6 @@
   .hero-title {
     font-size: 58px;
     font-weight: 100px;
-    line-height: 1;
   }
   
   .button-group {
@@ -303,10 +303,18 @@
 
   .about-us-button {
     width: 100%;
-    padding: 12px 20px;
+    padding: 12px 5px;
     font-size: 12px;
     color: white;
   }
+
+  .about-us-button .avatar-icons {
+    margin-right: 2px;
+    z-index: 2;
+    display: inline-block;
+    transition: none;
+  }
+  
 
   .become-member-button::before {
     padding: 12px 20px;

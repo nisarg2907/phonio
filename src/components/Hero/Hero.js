@@ -32,7 +32,7 @@ export default function Hero() {
 
                     <button className="about-us-button">
                         <span className="avatar-icons">
-                            <Image loading="lazy" src="https://cdn.prod.website-files.com/6708f85ff3d3cba6aff436fb/67792689c6fdc72c7e6abfa1_button-faces.png" alt="Dennis Snellenberg and Ilja van Eck" height={42} width={74} />
+                            <Image loading="lazy" src="https://cdn.prod.website-files.com/6708f85ff3d3cba6aff436fb/67792689c6fdc72c7e6abfa1_button-faces.png" alt="Dennis Snellenberg and Ilja van Eck" height={32} width={64} />
                         </span>
                         <span className="about-us-text" data-text="About us">
                             <span>About us</span>
