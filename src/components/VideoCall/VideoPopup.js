@@ -1,153 +1,214 @@
 'use client';
+
 import { useState, useEffect, useRef } from 'react';
-import '@/styles/videopopup.css';
+import {
+  ControlBar,
+  GridLayout,
+  LiveKitRoom,
+  ParticipantTile,
+  RoomAudioRenderer,
+  useTracks,
+} from '@livekit/components-react';
+import '@livekit/components-styles';
+import { Track } from 'livekit-client';
 
-export default function VideoPopup({ onClose }) {
+export default function VideoCallPopup({ roomId, username, onClose }) {
+  const [token, setToken] = useState('');
   const popupRef = useRef(null);
-  const [position, setPosition] = useState({ x: 50, y: 100 });
   const [isDragging, setIsDragging] = useState(false);
-  const [isPiP, setIsPiP] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isVideoOff, setIsVideoOff] = useState(false);
+  const [position, setPosition] = useState({ x: 50, y: 50 });
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  
-  const [localStream, setLocalStream] = useState(null);
-  
+  const [isPiP, setIsPiP] = useState(false);
+  const [size, setSize] = useState({ width: 800, height: 600 });
+
   useEffect(() => {
-    const buildTime = document.querySelector('meta[name="build-time"]')?.content;
-    if (buildTime) {
-      console.log(`Page last built at: ${buildTime}`);
-    }
+    const fetchToken = async () => {
+      try {
+        const resp = await fetch(`/api/token?room=${roomId}&username=${username}`);
+        const data = await resp.json();
+        setToken(data.token);
+      } catch (e) {
+        console.error(e);
+      }
+    };
 
-    if (typeof navigator !== 'undefined' && navigator.mediaDevices) {
-      const getMedia = async () => {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: true, 
-            audio: true 
-          });
-          setLocalStream(stream);
-        } catch (err) {
-          console.error("Failed to get media:", err);
-        }
-      };
-      
-      getMedia();
-      
-      return () => {
-        if (localStream) {
-          localStream.getTracks().forEach(track => track.stop());
-        }
-      };
-    }
-  }, []);
+    fetchToken();
+  }, [roomId, username]);
 
+  // Handle dragging functionality
   const handleMouseDown = (e) => {
-    if (popupRef.current && !isPiP) {
-      setIsDragging(true);
-      const rect = popupRef.current.getBoundingClientRect();
-      setDragOffset({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      });
-    }
+    if (e.target.closest('.resize-handle')) return;
+    
+    setIsDragging(true);
+    setDragOffset({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
+    });
   };
 
   const handleMouseMove = (e) => {
-    if (isDragging && popupRef.current) {
-      setPosition({
-        x: e.clientX - dragOffset.x,
-        y: e.clientY - dragOffset.y
-      });
-    }
+    if (!isDragging) return;
+    
+    setPosition({
+      x: e.clientX - dragOffset.x,
+      y: e.clientY - dragOffset.y
+    });
   };
 
   const handleMouseUp = () => {
     setIsDragging(false);
   };
 
-  const toggleMute = () => {
-    if (localStream) {
-      localStream.getAudioTracks().forEach(track => {
-        track.enabled = !track.enabled;
-      });
-      setIsMuted(!isMuted);
+  // Handle resizing functionality
+  const handleResize = (e, direction) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startWidth = size.width;
+    const startHeight = size.height;
+    
+    function onMouseMove(mouseMoveEvent) {
+      const dx = mouseMoveEvent.clientX - startX;
+      const dy = mouseMoveEvent.clientY - startY;
+      
+      if (direction === 'se') {
+        setSize({
+          width: Math.max(300, startWidth + dx),
+          height: Math.max(200, startHeight + dy)
+        });
+      }
     }
+    
+    function onMouseUp() {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+    
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   };
 
-  const toggleVideo = () => {
-    if (localStream) {
-      localStream.getVideoTracks().forEach(track => {
-        track.enabled = !track.enabled;
-      });
-      setIsVideoOff(!isVideoOff);
-    }
-  };
-
+  // Toggle Picture-in-Picture mode
   const togglePiP = () => {
     setIsPiP(!isPiP);
+    if (!isPiP) {
+      // Small size for PiP mode
+      setSize({ width: 300, height: 200 });
+    } else {
+      // Return to normal size
+      setSize({ width: 800, height: 600 });
+    }
   };
 
+  // Attach global mouse move and up events
   useEffect(() => {
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
     
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging]);
+  }, [isDragging, dragOffset]);
+
+  if (!token) {
+    return <div className="popup">Loading call...</div>;
+  }
 
   return (
     <div 
-      className={`video-popup ${isPiP ? 'pip-mode' : ''}`}
-      style={isPiP ? { position: 'fixed', bottom: '20px', right: '20px' } : 
-        { left: `${position.x}px`, top: `${position.y}px` }}
       ref={popupRef}
+      className="video-call-popup"
+      style={{
+        position: 'fixed',
+        top: `${position.y}px`,
+        left: `${position.x}px`,
+        width: `${size.width}px`,
+        height: `${size.height}px`,
+        zIndex: 9999,
+        background: 'white',
+        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.3)',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        cursor: isDragging ? 'grabbing' : 'grab'
+      }}
     >
       <div 
-        className="video-popup-header"
+        className="popup-header"
         onMouseDown={handleMouseDown}
+        style={{
+          background: '#2c3e50',
+          color: 'white',
+          padding: '10px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
       >
-        <h3>Video Call</h3>
-        <div className="video-popup-controls">
-          <button onClick={togglePiP} className="pip-button">
+        <div>Video Call: Room {roomId}</div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button 
+            onClick={togglePiP}
+            style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}
+          >
             {isPiP ? 'Expand' : 'PiP'}
           </button>
-          <button onClick={onClose} className="close-button">×</button>
+          <button 
+            onClick={onClose}
+            style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}
+          >
+            ✕
+          </button>
         </div>
       </div>
       
-      <div className="video-container">
-        {localStream && (
-          <video
-            className="local-video"
-            autoPlay
-            muted
-            ref={(video) => {
-              if (video && localStream) video.srcObject = localStream;
-            }}
-          />
-        )}
-        <div className="remote-videos-placeholder">
-          {!localStream && <div className="video-placeholder">Camera access required</div>}
-        </div>
+      <div style={{ flex: 1, position: 'relative' }}>
+        <LiveKitRoom
+          video={true}
+          audio={true}
+          token={token}
+          serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
+          data-lk-theme="default"
+          style={{ height: '100%' }}
+        >
+          <VideoConferenceComponent />
+          <RoomAudioRenderer />
+          <ControlBar style={{ position: 'absolute', bottom: 0, width: '100%' }} />
+        </LiveKitRoom>
       </div>
       
-      <div className="video-controls">
-        <button 
-          onClick={toggleMute} 
-          className={`control-button ${isMuted ? 'muted' : ''}`}
-        >
-          {isMuted ? '🔇' : '🔊'}
-        </button>
-        <button 
-          onClick={toggleVideo} 
-          className={`control-button ${isVideoOff ? 'video-off' : ''}`}
-        >
-          {isVideoOff ? '📷' : '📹'}
-        </button>
-      </div>
+      <div 
+        className="resize-handle"
+        style={{
+          position: 'absolute',
+          right: 0,
+          bottom: 0,
+          width: '20px',
+          height: '20px',
+          cursor: 'se-resize'
+        }}
+        onMouseDown={(e) => handleResize(e, 'se')}
+      ></div>
     </div>
+  );
+}
+
+function VideoConferenceComponent() {
+  const tracks = useTracks(
+    [
+      { source: Track.Source.Camera, withPlaceholder: true },
+      { source: Track.Source.ScreenShare, withPlaceholder: false },
+    ],
+    { onlySubscribed: false },
+  );
+  
+  return (
+    <GridLayout tracks={tracks} style={{ height: '100%' }}>
+      <ParticipantTile />
+    </GridLayout>
   );
 }
