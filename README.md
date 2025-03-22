@@ -38,3 +38,8 @@
    ```
 
 2. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Deployment
+
+The application is deployed at the following URL:
+[https://phonio-dmem.vercel.app/](https://phonio-dmem.vercel.app/)
