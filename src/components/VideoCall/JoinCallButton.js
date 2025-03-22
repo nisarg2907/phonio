@@ -10,14 +10,27 @@ export default function JoinCallButton() {
   const [username, setUsername] = useState('user');
   const [roomId, setRoomId] = useState(`room-${Math.floor(Math.random() * 10000)}`);
 
-  const handleJoinCall = (e) => {
+  const handleJoinCall = async (e) => {
     e.preventDefault();
     if (!username.trim()) {
       alert('Please enter your name');
       return;
     }
-    setShowPopup(true);
-    setShowForm(false);
+
+    try {
+      const checkResp = await fetch(`/api/check-room?room=${roomId}`);
+      const checkData = await checkResp.json();
+
+      if (!checkData.exists) {
+        alert('Room does not exist.');
+        return;
+      }
+
+      setShowPopup(true);
+      setShowForm(false);
+    } catch (e) {
+      alert('An error occurred while checking the room.');
+    }
   };
 
   const closePopup = () => {

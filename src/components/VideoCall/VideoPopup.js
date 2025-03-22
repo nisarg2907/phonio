@@ -42,6 +42,7 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
     if (popupRef.current) {
       updatePopupStyles();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [position, size, isPiP]);
 
   const updatePopupStyles = () => {
@@ -207,6 +208,7 @@ export default function VideoCallPopup({ roomId, username, onClose }) {
         window.removeEventListener('mouseup', handleMouseUp);
       };
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDragging]);
   
   useEffect(() => {
