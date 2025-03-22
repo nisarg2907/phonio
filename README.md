@@ -3,7 +3,7 @@
 ### Prerequisites
 
 1. Make sure you have [Node.js](https://nodejs.org/) installed.
-2. Create a LiveKit account and obtain your API key and secret.
+2. Create a LiveKit account and obtain your API key , secret and the web socket url.
 
 ### Installation
 
@@ -19,7 +19,7 @@
    ```
 
 3. Set up your environment variables:
-   - Create a `.env.local` file in the root of your project.
+   - Create a `.env` file in the root of your project.
    - Copy the contents of `.env.example` into `.env`.
    - Replace the placeholder values with your actual LiveKit API key, secret, and URLs.
 
